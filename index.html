@@ -6,39 +6,133 @@
   <title>SPS OUTPUT</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#5eead4;--error:#f87171;--glass:rgba(255,255,255,0.03)}
-    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    body{margin:0;background:linear-gradient(180deg,#071021 0%,#071827 100%);color:#e6eef6;min-height:100vh;padding:28px}
-    .shell{max-width:1000px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
-    p.lead{margin:0;color:var(--muted);font-size:13px}
+    :root {
+      --bg:#0f1724;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#5eead4;
+      --error:#f87171;
+      --glass:rgba(255,255,255,0.03);
+    }
 
-    .controls{display:flex;gap:8px;align-items:center}
-    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.03);padding:8px 12px;border-radius:10px;color:var(--accent);cursor:pointer}
-    .btn:active{transform:translateY(1px)}
+    * {
+      box-sizing:border-box;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    }
 
-    .grid{display:grid;grid-template-columns:1fr 420px;gap:16px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03)}
-    .card h2{margin:0 0 8px 0;font-size:14px}
+    body {
+      margin:0;
+      background:linear-gradient(180deg,#071021 0%,#071827 100%);
+      color:#e6eef6;
+      min-height:100vh;
+      padding:28px;
+    }
 
-    .list{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-    .item{background:rgba(255,255,255,0.02);padding:8px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
-    .item .k{color:var(--muted);font-size:13px}
-    .item .v{font-weight:600}
-    .error{color:var(--error)}
+    .shell {
+      max-width:1000px;
+      margin:0 auto;
+    }
 
-    footer{margin-top:16px;color:var(--muted);font-size:13px;text-align:center}
+    header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
 
-    @media (max-width:900px){.grid{grid-template-columns:1fr}.list{grid-template-columns:1fr}}
+    h1 {
+      font-size:20px;
+      margin:0;
+    }
+
+    p.lead {
+      margin:0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .controls {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .btn {
+      background:var(--glass);
+      border:1px solid rgba(255,255,255,0.03);
+      padding:8px 12px;
+      border-radius:10px;
+      color:var(--accent);
+      cursor:pointer;
+    }
+
+    .btn:active {
+      transform:translateY(1px);
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns:1fr 420px;
+      gap:16px;
+    }
+
+    .card {
+      background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:14px;
+      border:1px solid rgba(255,255,255,0.03);
+      margin-bottom:12px;
+    }
+
+    .card h2 {
+      margin:0 0 8px 0;
+      font-size:14px;
+    }
+
+    .list {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+    }
+
+    .item {
+      background:rgba(255,255,255,0.02);
+      padding:8px;
+      border-radius:8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .item .k {
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .item .v {
+      font-weight:600;
+    }
+
+    .error {
+      color:var(--error);
+    }
+
+    @media (max-width:900px) {
+      .grid {
+        grid-template-columns:1fr;
+      }
+      .list {
+        grid-template-columns:1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="shell">
     <header>
       <div>
-        <h1>TEST OUTPUT </h1>
-        <p class="lead">Shows latest JSON from your Gist and highlights any *_ERROR values.</p>
+        <h1>TEST OUTPUT</h1>
+        <p class="lead">Shows latest Tests Results </p>
       </div>
       <div class="controls">
         <button id="refreshBtn" class="btn">Refresh now</button>
@@ -48,27 +142,26 @@
 
     <div class="grid">
       <div>
-        <div class="card" id="dataCard">
-          <h2>Latest values</h2>
+        <!-- MQTT BLOCK -->
+        <div class="card" id="mqttCard">
+          <h2>SPS Values</h2>
           <div id="time" style="color:var(--muted);font-size:13px;margin-bottom:8px">—</div>
-          <div class="list" id="valuesList"></div>
+          <div class="list" id="mqttList"></div>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <h2>Raw JSON</h2>
-          <pre id="raw" style="white-space:pre-wrap;font-size:12px;color:var(--muted);max-height:220px;overflow:auto;margin:0;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px">—</pre>
+        <!-- CAN BLOCK -->
+        <div class="card" id="canCard">
+          <h2>CAN Values</h2>
+          <div class="list" id="canList"></div>
         </div>
       </div>
 
       <div>
         <div class="card">
-          <!-- Hier war vorher der Chart -->
+          <!-- Platz für zukünftige Charts -->
         </div>
       </div>
     </div>
-
-    <footer>
-          </footer>
   </div>
 
   <script>
@@ -77,52 +170,76 @@
 
     const statusEl = document.getElementById('status');
     const refreshBtn = document.getElementById('refreshBtn');
-    const valuesList = document.getElementById('valuesList');
+    const mqttList = document.getElementById('mqttList');
+    const canList = document.getElementById('canList');
     const timeEl = document.getElementById('time');
-    const rawEl = document.getElementById('raw');
 
-    async function fetchAndRender(){
-      statusEl.textContent='Fetching...';
-      try{
-        const res=await fetch(GIST_RAW_URL+'?_='+Date.now());
-        if(!res.ok) throw new Error(res.status+' '+res.statusText);
-        const json=await res.json();
+    async function fetchAndRender() {
+      statusEl.textContent = 'Fetching...';
+      try {
+        const res = await fetch(GIST_RAW_URL + '?_=' + Date.now());
+        if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+        const json = await res.json();
         render(json);
-        statusEl.textContent='Last updated: '+new Date().toLocaleTimeString();
-      }catch(err){
-        statusEl.textContent='Error: '+err.message;
+        statusEl.textContent = 'Last updated: ' + new Date().toLocaleTimeString();
+      } catch (err) {
+        statusEl.textContent = 'Error: ' + err.message;
         console.error(err);
       }
     }
 
-    function render(json){
-      rawEl.textContent=JSON.stringify(json,null,2);
-      timeEl.textContent=json.time||'no timestamp';
-      const values=json.values||json||{};
-      valuesList.innerHTML='';
+    function render(json) {
+      timeEl.textContent = json.time || 'no timestamp';
+      const values = json.values || json || {};
 
-      for(const k of Object.keys(values)){
-        const v=values[k];
-        let numeric=0;
-        if(Array.isArray(v)&&v.length>0&&typeof v[0]==='number') numeric=v[0];
-        else if(typeof v==='number') numeric=v;
-        else if(Array.isArray(v)) numeric=v.length;
+      mqttList.innerHTML = '';
+      canList.innerHTML = '';
 
-        const isError=k.toUpperCase().includes('ERROR')||k.toUpperCase().includes('ERR');
-        const item=document.createElement('div');
-        item.className='item';
-        item.innerHTML=`<div class="k">${escapeHtml(k)}</div><div class="v ${isError?'error':''}">${escapeHtml(JSON.stringify(v))}</div>`;
-        valuesList.appendChild(item);
+      // MQTT Werte anzeigen
+      if (values.mqtt && typeof values.mqtt === 'object') {
+        for (const k of Object.keys(values.mqtt)) {
+          const v = values.mqtt[k];
+          const isError = k.toUpperCase().includes('ERROR') || k.toUpperCase().includes('ERR');
+          const item = document.createElement('div');
+          item.className = 'item';
+          item.innerHTML = `
+            <div class="k">${escapeHtml(k)}</div>
+            <div class="v ${isError ? 'error' : ''}">${escapeHtml(JSON.stringify(v))}</div>
+          `;
+          mqttList.appendChild(item);
+        }
+      }
+
+      // CAN Werte anzeigen
+      if (values.can && typeof values.can === 'object') {
+        for (const k of Object.keys(values.can)) {
+          const v = values.can[k];
+          const isError = k.toUpperCase().includes('ERROR') || k.toUpperCase().includes('ERR');
+          const item = document.createElement('div');
+          item.className = 'item';
+          item.innerHTML = `
+            <div class="k">${escapeHtml(k)}</div>
+            <div class="v ${isError ? 'error' : ''}">${escapeHtml(JSON.stringify(v))}</div>
+          `;
+          canList.appendChild(item);
+        }
       }
     }
 
-    function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
 
-    function startPolling(){fetchAndRender();setInterval(fetchAndRender,POLL_INTERVAL);}
+    function startPolling() {
+      fetchAndRender();
+      setInterval(fetchAndRender, POLL_INTERVAL);
+    }
 
-    refreshBtn.addEventListener('click',()=>{fetchAndRender();});
+    refreshBtn.addEventListener('click', fetchAndRender);
     startPolling();
   </script>
 </body>
 </html>
-
