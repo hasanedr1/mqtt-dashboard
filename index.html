@@ -66,10 +66,6 @@
       cursor:pointer;
     }
 
-    .btn:active {
-      transform:translateY(1px);
-    }
-
     .grid {
       display:grid;
       grid-template-columns:1fr 420px;
@@ -132,7 +128,7 @@
     <header>
       <div>
         <h1>TEST OUTPUT</h1>
-        <p class="lead">Shows latest Tests Results </p>
+        <p class="lead">Shows latest Tests Results</p>
       </div>
       <div class="controls">
         <button id="refreshBtn" class="btn">Refresh now</button>
@@ -142,23 +138,34 @@
 
     <div class="grid">
       <div>
-        <!-- MQTT BLOCK -->
-        <div class="card" id="mqttCard">
+        <!-- SPS -->
+        <div class="card">
           <h2>SPS Values</h2>
           <div id="time" style="color:var(--muted);font-size:13px;margin-bottom:8px">—</div>
-          <div class="list" id="mqttList"></div>
+          <div class="list" id="spsList"></div>
         </div>
 
-        <!-- CAN BLOCK -->
-        <div class="card" id="canCard">
+        <!-- TERMINAL / TASTER -->
+        <div class="card">
+          <h2>Terminal / Taster Values</h2>
+          <div class="list" id="terminalList"></div>
+        </div>
+
+        <!-- LAMPEN -->
+        <div class="card">
+          <h2>Terminal / RAN Lampen</h2>
+          <div class="list" id="lampList"></div>
+        </div>
+
+        <!-- CAN -->
+        <div class="card">
           <h2>CAN Values</h2>
           <div class="list" id="canList"></div>
         </div>
       </div>
-
       <div>
         <div class="card">
-          <!-- Platz für zukünftige Charts -->
+          <!-- Platz für spätere Diagramme -->
         </div>
       </div>
     </div>
@@ -170,7 +177,9 @@
 
     const statusEl = document.getElementById('status');
     const refreshBtn = document.getElementById('refreshBtn');
-    const mqttList = document.getElementById('mqttList');
+    const spsList = document.getElementById('spsList');
+    const terminalList = document.getElementById('terminalList');
+    const lampList = document.getElementById('lampList');
     const canList = document.getElementById('canList');
     const timeEl = document.getElementById('time');
 
@@ -192,34 +201,39 @@
       timeEl.textContent = json.time || 'no timestamp';
       const values = json.values || json || {};
 
-      mqttList.innerHTML = '';
+      spsList.innerHTML = '';
+      terminalList.innerHTML = '';
+      lampList.innerHTML = '';
       canList.innerHTML = '';
 
-      // MQTT Werte anzeigen
       if (values.mqtt && typeof values.mqtt === 'object') {
-        for (const k of Object.keys(values.mqtt)) {
-          const v = values.mqtt[k];
-          const isError = k.toUpperCase().includes('ERROR') || k.toUpperCase().includes('ERR');
+        for (const [k, vRaw] of Object.entries(values.mqtt)) {
+          const v = Array.isArray(vRaw) ? vRaw[0] : vRaw;
+          const isError = k.toUpperCase().includes('ERR');
           const item = document.createElement('div');
           item.className = 'item';
           item.innerHTML = `
             <div class="k">${escapeHtml(k)}</div>
-            <div class="v ${isError ? 'error' : ''}">${escapeHtml(JSON.stringify(v))}</div>
+            <div class="v ${isError ? 'error' : ''}">[${escapeHtml(v)}]</div>
           `;
-          mqttList.appendChild(item);
+
+          if (k.includes('Terminal') || k.includes('Taster')) {
+            terminalList.appendChild(item);
+          } else if (k.includes('Lampe')) {
+            lampList.appendChild(item);
+          } else {
+            spsList.appendChild(item);
+          }
         }
       }
 
-      // CAN Werte anzeigen
       if (values.can && typeof values.can === 'object') {
-        for (const k of Object.keys(values.can)) {
-          const v = values.can[k];
-          const isError = k.toUpperCase().includes('ERROR') || k.toUpperCase().includes('ERR');
+        for (const [k, v] of Object.entries(values.can)) {
           const item = document.createElement('div');
           item.className = 'item';
           item.innerHTML = `
             <div class="k">${escapeHtml(k)}</div>
-            <div class="v ${isError ? 'error' : ''}">${escapeHtml(JSON.stringify(v))}</div>
+            <div class="v">${escapeHtml(v)}</div>
           `;
           canList.appendChild(item);
         }
@@ -233,13 +247,9 @@
         .replace(/>/g, '&gt;');
     }
 
-    function startPolling() {
-      fetchAndRender();
-      setInterval(fetchAndRender, POLL_INTERVAL);
-    }
-
     refreshBtn.addEventListener('click', fetchAndRender);
-    startPolling();
+    fetchAndRender();
+    setInterval(fetchAndRender, POLL_INTERVAL);
   </script>
 </body>
 </html>
